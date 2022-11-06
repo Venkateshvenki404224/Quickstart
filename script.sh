@@ -9,7 +9,6 @@ case $option in
   	read -p "Enter the ip address: " ip 
 	if [[ "$ip" =~ ^(([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))$ ]]; then
 	read -p "Enter the name of the machine:" name
-	cd /home/kali/Tryhackme
 	if [ ! -d $name ]; then 
 		mkdir $name
 	else
@@ -37,7 +36,6 @@ case $option in
   2)
     echo "Welcome Back Sir!"
     echo "Here are your Solved/Ongoing Machine :"
-    cd /home/kali/Tryhackme
     sleep 1
     ls
     read -p "Enter the name of the machine:" machine
@@ -52,7 +50,6 @@ case $option in
   3)
   sleep 2
   echo "[+] Setting up the VPN "
-  cd /home/kali/Tryhackme
   sudo openvpn Venkatesh007.ovpn
   ;;
   4)
