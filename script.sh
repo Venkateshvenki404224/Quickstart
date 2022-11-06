@@ -4,11 +4,15 @@ echo "2) Old Machine?"
 echo "3) Connect VPN"
 echo "4) Exit"
 read -p "Enter the options: " option
+if [ ! -d TryHackMe ]; then
+	mkdir TryHackMe
+fi	
 case $option in
   1)
   	read -p "Enter the ip address: " ip 
 	if [[ "$ip" =~ ^(([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))$ ]]; then
 	read -p "Enter the name of the machine:" name
+	cd ~/TryHackMe
 	if [ ! -d $name ]; then 
 		mkdir $name
 	else
@@ -17,17 +21,18 @@ case $option in
 	fi        
 	if [ ! -d $name/nmap ]; then
 		mkdir $name/nmap
-	fi
+	fi	
 	if [ ! -d $name/gobuster ]; then
 		mkdir $name/gobuster
 	fi
 	echo "[+] Folder Created"
   	echo "[+] Running Nmap "
-	nmap -A  $ip >> $name/nmap/nmap.txt
-	echo "Scanned the IP:$ip using Nmap" >> $name/status.txt
+  	echo "Command used is nmap -A -sC -sV  -p- <IP>"
+	nmap -sC -sV -p- $ip >> $name/nmap/nmap
+	echo "Scanned the IP:$ip using Nmap" >> $name/status
 	echo "[+] Running Gobuster on the target"
-	gobuster dir -u $ip -w /usr/share/dirb/wordlists/common.txt >> $name/gobuster/scan.txt
-	echo "Scanned the IP:$ip using Gobuster" >> $name/status.txt
+	gobuster dir -u $ip -w /usr/share/dirb/wordlists/common.txt >> $name/gobuster/scan
+	echo "Scanned the IP:$ip using Gobuster" >> $name/status
 	else
   		echo "Invalid IP Address"
   		exit 1
@@ -35,23 +40,40 @@ case $option in
     	;;
   2)
     echo "Welcome Back Sir!"
-    echo "Here are your Solved/Ongoing Machine :"
     sleep 1
-    ls
-    read -p "Enter the name of the machine:" machine
-    cd $machine
-    if [ ! -f status ]; then
-    	echo "No Status File Found"
+    cd ~/TryHackMe
+    ls -d */ > ~/TryHackMe/list
+    [ -s ~/TryHackMe/list ] && result='pass' || result='fail'
+    if [ $result == 'pass' ]; then
+    	echo "Here are your Solved/Ongoing Machine :"
+    	cat ~/TryHackMe/list
+    	sleep 1
+    	rm -r ~/TryHackMe/list
+   	read -p "Enter the name of the machine:" machine
+    	cd $machine
+    	if [ ! -f status ]; then
+    		echo "No Status File Found"
+    	else
+    		sleep 2
+    		gedit status
+    	fi	
     else
-    	sleep 2
-    	gedit status
-    fi		
-    ;;
+    	rm -r ~/TryHackMe/list
+    	echo "Their is no Machine to list/Create a New Machine First"
+    fi			
+    	;;
   3)
-  sleep 2
-  echo "[+] Setting up the VPN "
-  sudo openvpn Venkatesh007.ovpn
-  ;;
+     find ~/TryHackMe -name *.ovpn > ~/TryHackMe/path
+     [ -s ~/TryHackMe/path ] && result='pass' || result='fail'
+     if [ $result == 'pass' ]; then 
+	value=`cat ~/TryHackMe/path` 
+	rm -r ~/TryHackMe/path
+	sudo openvpn $value  
+     else
+	echo "Please move your .ovpn configuration file to ~/TryHackMe"
+	rm -r ~/TryHackMe/path
+     fi
+     ;;
   4)
   echo "Thank you"
   exit 1
